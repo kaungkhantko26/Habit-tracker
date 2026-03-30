@@ -958,6 +958,35 @@ button:disabled {
   color: #005a3c;
 }
 
+.update-banner {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px 18px;
+}
+
+.update-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.update-banner-copy strong {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.update-banner-copy span {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.update-banner-action {
+  flex: 0 0 auto;
+  width: auto;
+}
+
 .empty-state {
   align-items: flex-start;
   background: rgba(255, 255, 255, 0.58);
@@ -1225,6 +1254,15 @@ button:disabled {
 
   .ghost-button,
   .primary-button {
+    width: 100%;
+  }
+
+  .update-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .update-banner-action {
     width: 100%;
   }
 

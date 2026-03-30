@@ -10,6 +10,7 @@ import { OnboardingDialog } from "./components/OnboardingDialog";
 import { ProfileDialog } from "./components/ProfileDialog";
 import { starterTracks } from "./data/presets";
 import { formatDateKey, subtractDays } from "./lib/date";
+import { applyPwaUpdate, subscribeToPwaUpdate } from "./lib/pwa";
 import { hasSupabaseEnv, supabase } from "./lib/supabase";
 import {
   buildBadges,
@@ -66,6 +67,7 @@ export default function App() {
   const [mutationBusy, setMutationBusy] = useState(false);
   const [pendingHabitId, setPendingHabitId] = useState<string | null>(null);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
+  const [updateReady, setUpdateReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -120,6 +122,8 @@ export default function App() {
 
     void loadWorkspace(session.user.id);
   }, [session?.user.id]);
+
+  useEffect(() => subscribeToPwaUpdate(() => setUpdateReady(true)), []);
 
   function handleHashChange() {
     setCurrentView(viewFromHash());
@@ -444,6 +448,17 @@ export default function App() {
         todayCompleted={completedToday}
         todayTarget={todayHabits.length}
       >
+        {updateReady ? (
+          <div className="update-banner panel">
+            <div className="update-banner-copy">
+              <strong>New version available</strong>
+              <span>Refresh to load the latest app update on this device.</span>
+            </div>
+            <button className="primary-button update-banner-action" onClick={applyPwaUpdate} type="button">
+              Refresh now
+            </button>
+          </div>
+        ) : null}
         {error ? <div className="notice error inline">{error}</div> : null}
         {dataLoading ? <div className="panel loading-panel">Syncing your workspace...</div> : null}
         {currentView === "dashboard" ? (
