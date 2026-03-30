@@ -1,6 +1,6 @@
 {
   "name": "HabitQuest",
-  "short_name": "HabitQuest",
+  "short_name": "HabitTracker",
   "description": "Gamified habit tracking with streaks, analytics, and achievements.",
   "start_url": "/",
   "display": "standalone",
