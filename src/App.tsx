@@ -209,30 +209,6 @@ export default function App() {
     return "Account created. Check your email if Supabase confirmation is enabled, then sign in.";
   }
 
-  async function handleGoogleSignIn() {
-    if (!supabase) {
-      return;
-    }
-
-    setAuthBusy(true);
-    setError(null);
-
-    const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (googleError) {
-      setError(googleError.message);
-      setAuthBusy(false);
-      return;
-    }
-
-    setAuthBusy(false);
-  }
-
   async function handleSignOut() {
     if (!supabase) {
       return;
@@ -436,7 +412,6 @@ export default function App() {
       <AuthCard
         busy={authBusy}
         error={error}
-        onGoogleSignIn={handleGoogleSignIn}
         onPasswordSignIn={handlePasswordSignIn}
         onPasswordSignUp={handlePasswordSignUp}
       />

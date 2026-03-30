@@ -913,47 +913,6 @@ button:disabled {
   color: var(--primary);
 }
 
-.auth-divider {
-  align-items: center;
-  color: var(--muted);
-  display: flex;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  background: rgba(44, 47, 48, 0.12);
-  content: "";
-  flex: 1;
-  height: 1px;
-}
-
-.oauth-button {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.82);
-  color: var(--ink);
-  display: inline-flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 18px;
-  padding: 14px 18px;
-}
-
-.oauth-mark {
-  align-items: center;
-  background: linear-gradient(135deg, #4285f4, #34a853);
-  border-radius: 50%;
-  color: white;
-  display: inline-flex;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 0.86rem;
-  font-weight: 800;
-  height: 28px;
-  justify-content: center;
-  width: 28px;
-}
-
 .field {
   display: flex;
   flex-direction: column;

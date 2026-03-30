@@ -3,7 +3,6 @@ import { FormEvent, useState } from "react";
 interface AuthCardProps {
   busy: boolean;
   error: string | null;
-  onGoogleSignIn: () => Promise<void>;
   onPasswordSignIn: (email: string, password: string) => Promise<void>;
   onPasswordSignUp: (email: string, password: string, displayName: string) => Promise<string | null>;
 }
@@ -11,7 +10,6 @@ interface AuthCardProps {
 export function AuthCard({
   busy,
   error,
-  onGoogleSignIn,
   onPasswordSignIn,
   onPasswordSignUp,
 }: AuthCardProps) {
@@ -106,13 +104,6 @@ export function AuthCard({
             {busy ? "Please wait..." : mode === "signup" ? "Create Account" : "Sign In"}
           </button>
         </form>
-        <div className="auth-divider">
-          <span>or</span>
-        </div>
-        <button className="oauth-button" disabled={busy} onClick={() => void onGoogleSignIn()} type="button">
-          <span className="oauth-mark">G</span>
-          Continue with Google
-        </button>
         {notice ? <div className="notice success">{notice}</div> : null}
         {error ? <div className="notice error">{error}</div> : null}
       </div>

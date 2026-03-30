@@ -1,9 +1,14 @@
 {
   "name": "HabitQuest",
   "short_name": "HabitTracker",
+  "id": "/",
   "description": "Gamified habit tracking with streaks, analytics, and achievements.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "lang": "en",
+  "dir": "ltr",
   "background_color": "#f8f7fb",
   "theme_color": "#6a37d4",
   "icons": [
