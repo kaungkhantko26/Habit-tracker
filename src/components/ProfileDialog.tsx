@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ProfileAvatar } from "./ProfileAvatar";
 import type { Profile, ProfileUpdatePayload } from "../types";
 
 interface ProfileDialogProps {
@@ -99,13 +100,7 @@ export function ProfileDialog({
         </div>
 
         <div className="profile-editor-preview tone-surface" data-color="violet">
-          <div className="profile-avatar large">
-            {form.avatar_url ? (
-              <img alt={previewName} src={form.avatar_url} />
-            ) : (
-              <span>{initials}</span>
-            )}
-          </div>
+          <ProfileAvatar alt={previewName} initials={initials} size="large" src={form.avatar_url} />
           <div className="profile-editor-copy">
             <h4>{previewName}</h4>
             <p>Keep your profile photo and links current so the app feels personal across devices.</p>

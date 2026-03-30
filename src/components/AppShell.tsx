@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ProfileAvatar } from "./ProfileAvatar";
 import type { AppView, LevelState, Profile } from "../types";
 
 interface AppShellProps {
@@ -69,9 +70,7 @@ export function AppShell({
         </div>
         <div className="profile-card tone-surface" data-color="blue">
           <div className="profile-card-row">
-            <div className="profile-avatar">
-              {profile?.avatar_url ? <img alt={displayName} src={profile.avatar_url} /> : <span>{initials}</span>}
-            </div>
+            <ProfileAvatar alt={displayName} initials={initials} src={profile?.avatar_url} />
             <div className="profile-copy">
               <strong>{displayName}</strong>
               <span>Public profile and links</span>
@@ -128,9 +127,7 @@ export function AppShell({
           </div>
           <div className="topbar-actions">
             <button className="profile-launcher" onClick={onOpenProfile} type="button">
-              <div className="profile-avatar small">
-                {profile?.avatar_url ? <img alt={displayName} src={profile.avatar_url} /> : <span>{initials}</span>}
-              </div>
+              <ProfileAvatar alt={displayName} initials={initials} size="small" src={profile?.avatar_url} />
               <span className="profile-launcher-label">Edit profile</span>
             </button>
             <div className="stat-pill">
