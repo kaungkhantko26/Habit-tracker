@@ -913,6 +913,20 @@ button:disabled {
   color: var(--primary);
 }
 
+.auth-helpers {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.auth-link-button {
+  background: transparent;
+  border: 0;
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;

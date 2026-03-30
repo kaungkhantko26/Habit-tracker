@@ -61,6 +61,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authBusy, setAuthBusy] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -101,7 +102,15 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+      } else if (event === "SIGNED_OUT") {
+        setRecoveryMode(false);
+      } else if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        setRecoveryMode(false);
+      }
+
       setSession(nextSession);
       setError(null);
     });
@@ -211,6 +220,51 @@ export default function App() {
 
     setAuthBusy(false);
     return "Account created. Check your email if Supabase confirmation is enabled, then sign in.";
+  }
+
+  async function handlePasswordResetRequest(email: string) {
+    if (!supabase) {
+      return null;
+    }
+
+    setAuthBusy(true);
+    setError(null);
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+
+    if (resetError) {
+      setError(resetError.message);
+      setAuthBusy(false);
+      return null;
+    }
+
+    setAuthBusy(false);
+    return "Password reset email sent. Open the link from your inbox to choose a new password.";
+  }
+
+  async function handlePasswordRecoveryUpdate(password: string) {
+    if (!supabase) {
+      return null;
+    }
+
+    setAuthBusy(true);
+    setError(null);
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password,
+    });
+
+    if (updateError) {
+      setError(updateError.message);
+      setAuthBusy(false);
+      return null;
+    }
+
+    setAuthBusy(false);
+    setRecoveryMode(false);
+    return "Password updated. You can continue using the app now.";
   }
 
   async function handleSignOut() {
@@ -416,8 +470,11 @@ export default function App() {
       <AuthCard
         busy={authBusy}
         error={error}
+        recoveryMode={recoveryMode}
         onPasswordSignIn={handlePasswordSignIn}
         onPasswordSignUp={handlePasswordSignUp}
+        onPasswordResetRequest={handlePasswordResetRequest}
+        onPasswordRecoveryUpdate={handlePasswordRecoveryUpdate}
       />
     );
   }
