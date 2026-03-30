@@ -82,7 +82,7 @@ export function AppShell({
 
       <div className="content-stack">
         <header className="topbar panel">
-          <div>
+          <div className="topbar-copy">
             <div className="eyebrow">Today</div>
             <h1>Welcome back, {displayName}</h1>
           </div>
@@ -105,13 +105,13 @@ export function AppShell({
               onClick={() => onViewChange(item.id)}
               type="button"
             >
-              <span>{item.icon}</span>
-              {item.label}
+              <span className="mobile-nav-icon">{item.icon}</span>
+              <span className="mobile-nav-label">{item.label}</span>
             </button>
           ))}
           <button className="mobile-nav-item accent" onClick={onOpenCreate} type="button">
-            <span>＋</span>
-            Add
+            <span className="mobile-nav-icon">＋</span>
+            <span className="mobile-nav-label">Add</span>
           </button>
         </nav>
       </div>
