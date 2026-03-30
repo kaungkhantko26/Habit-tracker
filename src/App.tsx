@@ -158,29 +158,79 @@ export default function App() {
     setDataLoading(false);
   }
 
-  async function handleSignIn(email: string) {
+  async function handlePasswordSignIn(email: string, password: string) {
     if (!supabase) {
-      return false;
+      return;
     }
 
     setAuthBusy(true);
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithOtp({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      password,
     });
 
     if (signInError) {
       setError(signInError.message);
       setAuthBusy(false);
-      return false;
+      return;
     }
 
     setAuthBusy(false);
-    return true;
+  }
+
+  async function handlePasswordSignUp(email: string, password: string, displayName: string) {
+    if (!supabase) {
+      return null;
+    }
+
+    setAuthBusy(true);
+    setError(null);
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: {
+          display_name: displayName.trim(),
+        },
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setAuthBusy(false);
+      return null;
+    }
+
+    setAuthBusy(false);
+    return "Account created. Check your email if Supabase confirmation is enabled, then sign in.";
+  }
+
+  async function handleGoogleSignIn() {
+    if (!supabase) {
+      return;
+    }
+
+    setAuthBusy(true);
+    setError(null);
+
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (googleError) {
+      setError(googleError.message);
+      setAuthBusy(false);
+      return;
+    }
+
+    setAuthBusy(false);
   }
 
   async function handleSignOut() {
@@ -382,7 +432,15 @@ export default function App() {
   }
 
   if (!session) {
-    return <AuthCard busy={authBusy} error={error} onSubmit={handleSignIn} />;
+    return (
+      <AuthCard
+        busy={authBusy}
+        error={error}
+        onGoogleSignIn={handleGoogleSignIn}
+        onPasswordSignIn={handlePasswordSignIn}
+        onPasswordSignUp={handlePasswordSignUp}
+      />
+    );
   }
 
   const todayHabits = buildHabitProgress(habits, logs);
