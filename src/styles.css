@@ -102,6 +102,8 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: sticky;
   top: 24px;
   height: calc(100vh - 48px);
@@ -293,12 +295,14 @@ button:disabled {
 .nav-list {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   gap: 8px;
 }
 
 .profile-card {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   gap: 14px;
   padding: 18px;
 }
@@ -406,6 +410,7 @@ button:disabled {
 
 .sidebar-summary {
   display: grid;
+  flex-shrink: 0;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   padding: 18px;
@@ -424,7 +429,9 @@ button:disabled {
 }
 
 .topbar {
+  align-items: start;
   gap: 20px;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .topbar-copy {
@@ -435,11 +442,17 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.level-card {
+  flex-shrink: 0;
+}
+
 .stat-pill {
   align-items: flex-start;
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 2px;
+  min-width: 112px;
   padding: 12px 14px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.66);
@@ -451,18 +464,29 @@ button:disabled {
   border: 0;
   border-radius: 18px;
   display: flex;
+  flex: 0 0 auto;
   gap: 10px;
+  max-width: 100%;
   padding: 8px 10px;
 }
 
 .profile-launcher-label {
   font-size: 0.8rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .stat-pill strong {
   font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 1.2rem;
+}
+
+.topbar-actions {
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .hero-grid,
@@ -1137,6 +1161,10 @@ button:disabled {
     flex-direction: column;
   }
 
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
   .topbar,
   .hero-card,
   .list-panel,
@@ -1161,6 +1189,10 @@ button:disabled {
 
   .profile-launcher {
     justify-content: flex-start;
+  }
+
+  .profile-launcher-label {
+    white-space: normal;
   }
 
   .ghost-button,
