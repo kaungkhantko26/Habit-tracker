@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { ProfileAvatar } from "./ProfileAvatar";
+import { getProfileAvatarCandidates } from "../lib/avatar";
 import type { AppView, LevelState, Profile } from "../types";
 
 interface AppShellProps {
@@ -49,6 +50,7 @@ export function AppShell({
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
+  const avatarCandidates = useMemo(() => getProfileAvatarCandidates(profile ?? {}), [profile]);
 
   return (
     <div className="app-shell">
@@ -70,7 +72,7 @@ export function AppShell({
         </div>
         <div className="profile-card tone-surface" data-color="blue">
           <div className="profile-card-row">
-            <ProfileAvatar alt={displayName} initials={initials} src={profile?.avatar_url} />
+            <ProfileAvatar alt={displayName} fallbackSrcs={avatarCandidates} initials={initials} />
             <div className="profile-copy">
               <strong>{displayName}</strong>
               <span>Public profile and links</span>
@@ -127,7 +129,7 @@ export function AppShell({
           </div>
           <div className="topbar-actions">
             <button className="profile-launcher" onClick={onOpenProfile} type="button">
-              <ProfileAvatar alt={displayName} initials={initials} size="small" src={profile?.avatar_url} />
+              <ProfileAvatar alt={displayName} fallbackSrcs={avatarCandidates} initials={initials} size="small" />
               <span className="profile-launcher-label">Edit profile</span>
             </button>
             <div className="stat-pill">

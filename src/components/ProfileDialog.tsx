@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { ProfileAvatar } from "./ProfileAvatar";
+import { getProfileAvatarCandidates } from "../lib/avatar";
 import type { Profile, ProfileUpdatePayload } from "../types";
 
 interface ProfileDialogProps {
@@ -68,6 +69,7 @@ export function ProfileDialog({
 
   const previewName = form.display_name.trim() || fallbackName;
   const initials = useMemo(() => initialsFromName(previewName || "HQ"), [previewName]);
+  const avatarCandidates = useMemo(() => getProfileAvatarCandidates(form), [form]);
 
   if (!open) {
     return null;
@@ -100,10 +102,10 @@ export function ProfileDialog({
         </div>
 
         <div className="profile-editor-preview tone-surface" data-color="violet">
-          <ProfileAvatar alt={previewName} initials={initials} size="large" src={form.avatar_url} />
+          <ProfileAvatar alt={previewName} fallbackSrcs={avatarCandidates} initials={initials} size="large" />
           <div className="profile-editor-copy">
             <h4>{previewName}</h4>
-            <p>Keep your profile photo and links current so the app feels personal across devices.</p>
+            <p>Paste an image URL, GitHub profile, or site link and the app will try to detect the avatar automatically.</p>
           </div>
         </div>
 
@@ -123,7 +125,7 @@ export function ProfileDialog({
               <span>Profile photo URL</span>
               <input
                 onChange={(event) => setForm({ ...form, avatar_url: event.target.value })}
-                placeholder="https://..."
+                placeholder="Image URL or profile link"
                 value={form.avatar_url}
               />
             </label>

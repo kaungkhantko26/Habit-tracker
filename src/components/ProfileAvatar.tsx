@@ -2,22 +2,23 @@ import { useEffect, useState } from "react";
 
 interface ProfileAvatarProps {
   alt: string;
+  fallbackSrcs?: string[];
   initials: string;
   size?: "default" | "small" | "large";
-  src?: string | null;
 }
 
 export function ProfileAvatar({
   alt,
+  fallbackSrcs = [],
   initials,
   size = "default",
-  src,
 }: ProfileAvatarProps) {
-  const [imageFailed, setImageFailed] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const fallbackKey = fallbackSrcs.join("|");
 
   useEffect(() => {
-    setImageFailed(false);
-  }, [src]);
+    setCurrentIndex(0);
+  }, [fallbackKey]);
 
   const className =
     size === "small"
@@ -25,11 +26,12 @@ export function ProfileAvatar({
       : size === "large"
         ? "profile-avatar large"
         : "profile-avatar";
+  const activeSrc = fallbackSrcs[currentIndex];
 
   return (
     <div className={className}>
-      {src && !imageFailed ? (
-        <img alt={alt} onError={() => setImageFailed(true)} src={src} />
+      {activeSrc ? (
+        <img alt={alt} onError={() => setCurrentIndex((index) => index + 1)} src={activeSrc} />
       ) : (
         <span>{initials}</span>
       )}
