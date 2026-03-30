@@ -6,7 +6,21 @@ export type StarterTrackId = "wellness" | "fitness" | "focus" | "learning";
 export interface Profile {
   id: string;
   display_name: string | null;
+  avatar_url: string | null;
+  website_url: string | null;
+  github_url: string | null;
+  instagram_url: string | null;
+  x_url: string | null;
   created_at: string;
+}
+
+export interface ProfileUpdatePayload {
+  display_name: string;
+  avatar_url: string;
+  website_url: string;
+  github_url: string;
+  instagram_url: string;
+  x_url: string;
 }
 
 export interface Habit {

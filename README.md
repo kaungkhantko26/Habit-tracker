@@ -22,22 +22,16 @@ HabitQuest is a production-ready React app for the habit-tracker concept in this
    npm install
    ```
 
-2. Copy the environment template:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Create a Supabase project and add:
+2. Create a local `.env` file and add:
 
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
 
-4. In the Supabase SQL editor, run [`supabase/schema.sql`](./supabase/schema.sql).
+3. In the Supabase SQL editor, run [`supabase/schema.sql`](./supabase/schema.sql).
 
-5. Enable Email Auth in Supabase Authentication settings.
+4. Enable Email Auth in Supabase Authentication settings.
 
-6. Start the app:
+5. Start the app:
 
    ```bash
    npm run dev

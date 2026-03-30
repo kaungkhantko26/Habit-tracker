@@ -7,6 +7,7 @@ import { AppShell } from "./components/AppShell";
 import { CreateHabitDialog } from "./components/CreateHabitDialog";
 import { DashboardView } from "./components/DashboardView";
 import { OnboardingDialog } from "./components/OnboardingDialog";
+import { ProfileDialog } from "./components/ProfileDialog";
 import { starterTracks } from "./data/presets";
 import { formatDateKey, subtractDays } from "./lib/date";
 import { hasSupabaseEnv, supabase } from "./lib/supabase";
@@ -19,7 +20,16 @@ import {
   calculateLongestStreak,
   calculatePerfectDays,
 } from "./lib/stats";
-import type { AppView, ColorToken, Habit, HabitLog, NewHabitPayload, Profile, StarterTrackId } from "./types";
+import type {
+  AppView,
+  ColorToken,
+  Habit,
+  HabitLog,
+  NewHabitPayload,
+  Profile,
+  ProfileUpdatePayload,
+  StarterTrackId,
+} from "./types";
 
 function viewFromHash(): AppView {
   const candidate = window.location.hash.replace("#", "");
@@ -36,12 +46,10 @@ function SetupState() {
         <div className="eyebrow">Supabase Setup Required</div>
         <h1>Connect a real backend before you deploy.</h1>
         <p className="auth-copy">
-          Add your Supabase URL and anon key to `.env`, then run the SQL from
-          `supabase/schema.sql`. The app is already wired for live auth and live data.
+          Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to your local `.env` or hosting
+          environment, then run the SQL from `supabase/schema.sql`. The app is already wired for
+          live auth and live data.
         </p>
-        <div className="notice">
-          <code>cp .env.example .env</code>
-        </div>
       </div>
     </div>
   );
@@ -54,6 +62,7 @@ export default function App() {
   const [authBusy, setAuthBusy] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
   const [pendingHabitId, setPendingHabitId] = useState<string | null>(null);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
@@ -215,6 +224,39 @@ export default function App() {
     setMutationBusy(false);
   }
 
+  async function handleSaveProfile(payload: ProfileUpdatePayload) {
+    if (!supabase || !session?.user.id) {
+      return;
+    }
+
+    setMutationBusy(true);
+    setError(null);
+
+    const { data, error: updateError } = await supabase
+      .from("profiles")
+      .upsert({
+        id: session.user.id,
+        display_name: payload.display_name,
+        avatar_url: payload.avatar_url || null,
+        website_url: payload.website_url || null,
+        github_url: payload.github_url || null,
+        instagram_url: payload.instagram_url || null,
+        x_url: payload.x_url || null,
+      })
+      .select("*")
+      .single();
+
+    if (updateError) {
+      setError(updateError.message);
+      setMutationBusy(false);
+      return;
+    }
+
+    setProfile(data as Profile);
+    setProfileOpen(false);
+    setMutationBusy(false);
+  }
+
   async function handleCompleteOnboarding(trackId: StarterTrackId, accent: ColorToken) {
     if (!supabase || !session?.user.id) {
       return;
@@ -360,6 +402,8 @@ export default function App() {
         currentView={currentView}
         displayName={displayName}
         level={level}
+        profile={profile}
+        onOpenProfile={() => setProfileOpen(true)}
         onOpenCreate={() => setCreateOpen(true)}
         onSignOut={handleSignOut}
         onViewChange={handleViewChange}
@@ -398,6 +442,14 @@ export default function App() {
         onClose={() => setCreateOpen(false)}
         onCreate={handleCreateHabit}
         open={createOpen}
+      />
+      <ProfileDialog
+        busy={mutationBusy}
+        fallbackName={displayName}
+        onClose={() => setProfileOpen(false)}
+        onSave={handleSaveProfile}
+        open={profileOpen}
+        profile={profile}
       />
       <OnboardingDialog
         busy={onboardingBusy}

@@ -1,14 +1,16 @@
 import type { ReactNode } from "react";
-import type { AppView, LevelState } from "../types";
+import type { AppView, LevelState, Profile } from "../types";
 
 interface AppShellProps {
   children: ReactNode;
   currentView: AppView;
   displayName: string;
   level: LevelState;
+  profile: Profile | null;
   streak: number;
   todayCompleted: number;
   todayTarget: number;
+  onOpenProfile: () => void;
   onOpenCreate: () => void;
   onSignOut: () => Promise<void>;
   onViewChange: (view: AppView) => void;
@@ -25,13 +27,28 @@ export function AppShell({
   currentView,
   displayName,
   level,
+  profile,
   streak,
   todayCompleted,
   todayTarget,
+  onOpenProfile,
   onOpenCreate,
   onSignOut,
   onViewChange,
 }: AppShellProps) {
+  const socialLinks = [
+    profile?.website_url ? { id: "website", label: "Site", href: profile.website_url } : null,
+    profile?.github_url ? { id: "github", label: "GitHub", href: profile.github_url } : null,
+    profile?.instagram_url ? { id: "instagram", label: "Instagram", href: profile.instagram_url } : null,
+    profile?.x_url ? { id: "x", label: "X", href: profile.x_url } : null,
+  ].filter(Boolean) as Array<{ id: string; label: string; href: string }>;
+
+  const initials = displayName
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
   return (
     <div className="app-shell">
       <aside className="sidebar panel">
@@ -49,6 +66,29 @@ export function AppShell({
             <span className="progress-fill" style={{ width: `${level.progressPercent}%` }} />
           </div>
           <p>{Math.max(0, level.nextLevelXp - level.totalXp)} XP to the next level</p>
+        </div>
+        <div className="profile-card tone-surface" data-color="blue">
+          <div className="profile-card-row">
+            <div className="profile-avatar">
+              {profile?.avatar_url ? <img alt={displayName} src={profile.avatar_url} /> : <span>{initials}</span>}
+            </div>
+            <div className="profile-copy">
+              <strong>{displayName}</strong>
+              <span>Public profile and links</span>
+            </div>
+          </div>
+          {socialLinks.length > 0 ? (
+            <div className="social-link-row">
+              {socialLinks.map((link) => (
+                <a className="social-link-chip" href={link.href} key={link.id} rel="noreferrer" target="_blank">
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          ) : null}
+          <button className="ghost-button compact" onClick={onOpenProfile} type="button">
+            Edit Profile
+          </button>
         </div>
         <nav className="nav-list">
           {navItems.map((item) => (
@@ -87,6 +127,12 @@ export function AppShell({
             <h1>Welcome back, {displayName}</h1>
           </div>
           <div className="topbar-actions">
+            <button className="profile-launcher" onClick={onOpenProfile} type="button">
+              <div className="profile-avatar small">
+                {profile?.avatar_url ? <img alt={displayName} src={profile.avatar_url} /> : <span>{initials}</span>}
+              </div>
+              <span className="profile-launcher-label">Edit profile</span>
+            </button>
             <div className="stat-pill">
               <strong>{todayCompleted}</strong>
               <span>quests cleared</span>

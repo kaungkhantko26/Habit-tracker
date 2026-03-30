@@ -3,8 +3,19 @@ create extension if not exists "pgcrypto";
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
+  avatar_url text,
+  website_url text,
+  github_url text,
+  instagram_url text,
+  x_url text,
   created_at timestamptz not null default now()
 );
+
+alter table public.profiles add column if not exists avatar_url text;
+alter table public.profiles add column if not exists website_url text;
+alter table public.profiles add column if not exists github_url text;
+alter table public.profiles add column if not exists instagram_url text;
+alter table public.profiles add column if not exists x_url text;
 
 create table if not exists public.habits (
   id uuid primary key default gen_random_uuid(),

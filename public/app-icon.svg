@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="hq-gradient" x1="72" x2="440" y1="64" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6a37d4" />
+      <stop offset="0.5" stop-color="#8f63f3" />
+      <stop offset="1" stop-color="#69f6b8" />
+    </linearGradient>
+    <linearGradient id="hq-inner" x1="112" x2="400" y1="112" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f8f0ff" />
+      <stop offset="1" stop-color="#ffffff" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="144" fill="url(#hq-gradient)" />
+  <circle cx="256" cy="256" r="150" fill="url(#hq-inner)" opacity="0.18" />
+  <path
+    d="M164 274c0-54 38-94 92-94 37 0 70 20 84 49l-39 20c-9-17-25-28-46-28-30 0-52 23-52 53 0 31 23 54 54 54 22 0 39-11 47-29l39 20c-15 31-48 50-89 50-56 0-90-35-90-95Z"
+    fill="#f8f0ff"
+  />
+  <path
+    d="m222 256 33 34 74-84"
+    fill="none"
+    stroke="#69f6b8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="28"
+  />
+</svg>
