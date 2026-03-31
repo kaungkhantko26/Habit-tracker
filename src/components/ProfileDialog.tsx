@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { ProfileAvatar } from "./ProfileAvatar";
 import { getProfileAvatarCandidates } from "../lib/avatar";
 import type { Profile, ProfileUpdatePayload } from "../types";
@@ -10,6 +10,8 @@ interface ProfileDialogProps {
   fallbackName: string;
   onClose: () => void;
   onSave: (payload: ProfileUpdatePayload) => Promise<void>;
+  onUploadAvatar: (file: File) => Promise<string | null>;
+  uploadingAvatar: boolean;
 }
 
 const emptyState: ProfileUpdatePayload = {
@@ -49,6 +51,8 @@ export function ProfileDialog({
   fallbackName,
   onClose,
   onSave,
+  onUploadAvatar,
+  uploadingAvatar,
 }: ProfileDialogProps) {
   const [form, setForm] = useState<ProfileUpdatePayload>(emptyState);
 
@@ -87,6 +91,26 @@ export function ProfileDialog({
     });
   }
 
+  async function handleAvatarFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    const uploadedUrl = await onUploadAvatar(file);
+
+    if (!uploadedUrl) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      avatar_url: uploadedUrl,
+    }));
+  }
+
   return (
     <div className="dialog-shell" role="dialog" aria-modal="true">
       <div className="dialog-backdrop" onClick={onClose} />
@@ -105,7 +129,7 @@ export function ProfileDialog({
           <ProfileAvatar alt={previewName} fallbackSrcs={avatarCandidates} initials={initials} size="large" />
           <div className="profile-editor-copy">
             <h4>{previewName}</h4>
-            <p>Paste an image URL, GitHub profile, or site link and the app will try to detect the avatar automatically.</p>
+            <p>Upload a photo or paste an image, GitHub, or site link and the app will try to keep your avatar in sync automatically.</p>
           </div>
         </div>
 
@@ -128,6 +152,10 @@ export function ProfileDialog({
                 placeholder="Image URL or profile link"
                 value={form.avatar_url}
               />
+            </label>
+            <label className="field">
+              <span>Upload profile photo</span>
+              <input accept="image/*" onChange={handleAvatarFileChange} type="file" />
             </label>
             <label className="field">
               <span>Website</span>
@@ -164,8 +192,12 @@ export function ProfileDialog({
           </div>
 
           <div className="dialog-actions">
-            <div className="field-help">Use public image URLs only. No secrets or signed URLs here.</div>
-            <button className="primary-button" disabled={busy} type="submit">
+            <div className="field-help">
+              {uploadingAvatar
+                ? "Uploading avatar..."
+                : "Uploads are stored in your Supabase project. Links still work for GitHub and website-based avatars."}
+            </div>
+            <button className="primary-button" disabled={busy || uploadingAvatar} type="submit">
               {busy ? "Saving..." : "Save Profile"}
             </button>
           </div>

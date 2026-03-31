@@ -66,6 +66,7 @@ export default function App() {
   const [createOpen, setCreateOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [pendingHabitId, setPendingHabitId] = useState<string | null>(null);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
@@ -341,6 +342,42 @@ export default function App() {
     setMutationBusy(false);
   }
 
+  async function handleAvatarUpload(file: File) {
+    if (!supabase || !session?.user.id) {
+      return null;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Choose an image file for the profile photo.");
+      return null;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Profile photos must be 5 MB or smaller.");
+      return null;
+    }
+
+    setAvatarUploading(true);
+    setError(null);
+
+    const filePath = `${session.user.id}/avatar`;
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: true,
+    });
+
+    if (uploadError) {
+      setError(uploadError.message);
+      setAvatarUploading(false);
+      return null;
+    }
+
+    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+    setAvatarUploading(false);
+    return `${data.publicUrl}?t=${Date.now()}`;
+  }
+
   async function handleCompleteOnboarding(trackId: StarterTrackId, accent: ColorToken) {
     if (!supabase || !session?.user.id) {
       return;
@@ -553,8 +590,10 @@ export default function App() {
         fallbackName={displayName}
         onClose={() => setProfileOpen(false)}
         onSave={handleSaveProfile}
+        onUploadAvatar={handleAvatarUpload}
         open={profileOpen}
         profile={profile}
+        uploadingAvatar={avatarUploading}
       />
       <OnboardingDialog
         busy={onboardingBusy}
