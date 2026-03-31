@@ -22,6 +22,7 @@ const navItems: Array<{ id: AppView; label: string; icon: string }> = [
   { id: "dashboard", label: "Dashboard", icon: "◧" },
   { id: "analytics", label: "Analytics", icon: "▥" },
   { id: "achievements", label: "Badges", icon: "✦" },
+  { id: "community", label: "Community", icon: "◎" },
 ];
 
 export function AppShell({
@@ -75,7 +76,7 @@ export function AppShell({
             <ProfileAvatar alt={displayName} fallbackSrcs={avatarCandidates} initials={initials} />
             <div className="profile-copy">
               <strong>{displayName}</strong>
-              <span>Public profile and links</span>
+              <span>{profile?.username ? `@${profile.username}` : "Public profile and links"}</span>
             </div>
           </div>
           {socialLinks.length > 0 ? (

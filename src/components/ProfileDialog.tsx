@@ -16,6 +16,7 @@ interface ProfileDialogProps {
 
 const emptyState: ProfileUpdatePayload = {
   display_name: "",
+  username: "",
   avatar_url: "",
   website_url: "",
   github_url: "",
@@ -63,6 +64,7 @@ export function ProfileDialog({
 
     setForm({
       display_name: profile?.display_name ?? fallbackName,
+      username: profile?.username ?? "",
       avatar_url: profile?.avatar_url ?? "",
       website_url: profile?.website_url ?? "",
       github_url: profile?.github_url ?? "",
@@ -83,6 +85,7 @@ export function ProfileDialog({
     event.preventDefault();
     await onSave({
       display_name: form.display_name.trim(),
+      username: form.username.trim(),
       avatar_url: normalizeUrl(form.avatar_url),
       website_url: normalizeUrl(form.website_url),
       github_url: normalizeUrl(form.github_url),
@@ -136,13 +139,23 @@ export function ProfileDialog({
         <form className="dialog-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label className="field">
-              <span>Username</span>
+              <span>Display name</span>
               <input
                 maxLength={40}
                 onChange={(event) => setForm({ ...form, display_name: event.target.value })}
                 placeholder="Alex Chen"
                 required
                 value={form.display_name}
+              />
+            </label>
+            <label className="field">
+              <span>Findable username</span>
+              <input
+                maxLength={20}
+                onChange={(event) => setForm({ ...form, username: event.target.value.replace(/\s+/g, "") })}
+                placeholder="@alex_chen"
+                required
+                value={form.username}
               />
             </label>
             <label className="field">
@@ -195,7 +208,7 @@ export function ProfileDialog({
             <div className="field-help">
               {uploadingAvatar
                 ? "Uploading avatar..."
-                : "Uploads are stored in your Supabase project. Links still work for GitHub and website-based avatars."}
+                : "Usernames use 3-20 letters, numbers, or underscores. Uploads are stored in your Supabase project."}
             </div>
             <button className="primary-button" disabled={busy || uploadingAvatar} type="submit">
               {busy ? "Saving..." : "Save Profile"}

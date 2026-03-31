@@ -1,11 +1,12 @@
 export type Frequency = "daily" | "weekdays" | "weekends" | "custom";
 export type ColorToken = "violet" | "mint" | "orange" | "blue" | "rose";
-export type AppView = "dashboard" | "analytics" | "achievements";
+export type AppView = "dashboard" | "analytics" | "achievements" | "community";
 export type StarterTrackId = "wellness" | "fitness" | "focus" | "learning";
 
 export interface Profile {
   id: string;
   display_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   website_url: string | null;
   github_url: string | null;
@@ -16,11 +17,32 @@ export interface Profile {
 
 export interface ProfileUpdatePayload {
   display_name: string;
+  username: string;
   avatar_url: string;
   website_url: string;
   github_url: string;
   instagram_url: string;
   x_url: string;
+}
+
+export interface FriendSearchResult {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  is_friend: boolean;
+}
+
+export interface LeaderboardEntry {
+  profile_id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  total_xp: number;
+  completed_days: number;
+  level: number;
+  rank: number;
+  is_you: boolean;
 }
 
 export interface Habit {

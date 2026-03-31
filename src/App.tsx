@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AuthCard } from "./components/AuthCard";
 import { AchievementsView } from "./components/AchievementsView";
 import { AnalyticsView } from "./components/AnalyticsView";
 import { AppShell } from "./components/AppShell";
+import { CommunityView } from "./components/CommunityView";
 import { CreateHabitDialog } from "./components/CreateHabitDialog";
 import { DashboardView } from "./components/DashboardView";
 import { OnboardingDialog } from "./components/OnboardingDialog";
@@ -26,6 +27,8 @@ import type {
   ColorToken,
   Habit,
   HabitLog,
+  FriendSearchResult,
+  LeaderboardEntry,
   NewHabitPayload,
   Profile,
   ProfileUpdatePayload,
@@ -34,10 +37,19 @@ import type {
 
 function viewFromHash(): AppView {
   const candidate = window.location.hash.replace("#", "");
-  if (candidate === "analytics" || candidate === "achievements") {
+  if (candidate === "analytics" || candidate === "achievements" || candidate === "community") {
     return candidate;
   }
   return "dashboard";
+}
+
+function normalizeUsername(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^@+/, "")
+    .replace(/[^a-z0-9_]/g, "")
+    .slice(0, 20);
 }
 
 function SetupState() {
@@ -69,11 +81,18 @@ export default function App() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [pendingHabitId, setPendingHabitId] = useState<string | null>(null);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
+  const [socialBusy, setSocialBusy] = useState(false);
+  const [socialActionId, setSocialActionId] = useState<string | null>(null);
+  const [friendSearch, setFriendSearch] = useState("");
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [friendSearchResults, setFriendSearchResults] = useState<FriendSearchResult[]>([]);
+  const [searchingFriends, setSearchingFriends] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [logs, setLogs] = useState<HabitLog[]>([]);
+  const deferredFriendSearch = useDeferredValue(friendSearch);
 
   useEffect(() => {
     window.addEventListener("hashchange", handleHashChange);
@@ -132,6 +151,33 @@ export default function App() {
 
     void loadWorkspace(session.user.id);
   }, [session?.user.id]);
+
+  useEffect(() => {
+    if (!session?.user.id || !supabase) {
+      setLeaderboard([]);
+      return;
+    }
+
+    void loadLeaderboard();
+  }, [session?.user.id, habits, logs]);
+
+  useEffect(() => {
+    if (!session?.user.id || !supabase) {
+      setFriendSearchResults([]);
+      setSearchingFriends(false);
+      return;
+    }
+
+    const query = normalizeUsername(deferredFriendSearch);
+
+    if (query.length < 2) {
+      setFriendSearchResults([]);
+      setSearchingFriends(false);
+      return;
+    }
+
+    void searchFriends(query);
+  }, [deferredFriendSearch, session?.user.id]);
 
   useEffect(() => subscribeToPwaUpdate(() => setUpdateReady(true)), []);
 
@@ -314,6 +360,12 @@ export default function App() {
       return;
     }
 
+    const username = normalizeUsername(payload.username);
+    if (username.length < 3) {
+      setError("Username must be at least 3 characters and use only letters, numbers, or underscores.");
+      return;
+    }
+
     setMutationBusy(true);
     setError(null);
 
@@ -322,6 +374,7 @@ export default function App() {
       .upsert({
         id: session.user.id,
         display_name: payload.display_name,
+        username,
         avatar_url: payload.avatar_url || null,
         website_url: payload.website_url || null,
         github_url: payload.github_url || null,
@@ -340,6 +393,98 @@ export default function App() {
     setProfile(data as Profile);
     setProfileOpen(false);
     setMutationBusy(false);
+  }
+
+  async function loadLeaderboard() {
+    if (!supabase) {
+      return;
+    }
+
+    const { data, error: leaderboardError } = await supabase.rpc("get_friend_leaderboard");
+
+    if (leaderboardError) {
+      setError(leaderboardError.message);
+      return;
+    }
+
+    setLeaderboard((data ?? []) as LeaderboardEntry[]);
+  }
+
+  async function searchFriends(query: string) {
+    if (!supabase) {
+      return;
+    }
+
+    if (query.length < 2) {
+      setFriendSearchResults([]);
+      setSearchingFriends(false);
+      return;
+    }
+
+    setSearchingFriends(true);
+
+    const { data, error: searchError } = await supabase.rpc("search_profiles", {
+      search_query: query,
+    });
+
+    if (searchError) {
+      setError(searchError.message);
+      setSearchingFriends(false);
+      return;
+    }
+
+    setFriendSearchResults((data ?? []) as FriendSearchResult[]);
+    setSearchingFriends(false);
+  }
+
+  async function handleAddFriend(username: string) {
+    if (!supabase) {
+      return;
+    }
+
+    setSocialBusy(true);
+    setSocialActionId(username);
+    setError(null);
+
+    const { error: addError } = await supabase.rpc("add_friend_by_username", {
+      friend_username: username,
+    });
+
+    if (addError) {
+      setError(addError.message);
+      setSocialBusy(false);
+      setSocialActionId(null);
+      return;
+    }
+
+    await Promise.all([loadLeaderboard(), searchFriends(normalizeUsername(friendSearch))]);
+    setSocialBusy(false);
+    setSocialActionId(null);
+  }
+
+  async function handleRemoveFriend(profileId: string) {
+    if (!supabase) {
+      return;
+    }
+
+    setSocialBusy(true);
+    setSocialActionId(profileId);
+    setError(null);
+
+    const { error: removeError } = await supabase.rpc("remove_friend", {
+      friend_profile_id: profileId,
+    });
+
+    if (removeError) {
+      setError(removeError.message);
+      setSocialBusy(false);
+      setSocialActionId(null);
+      return;
+    }
+
+    await Promise.all([loadLeaderboard(), searchFriends(normalizeUsername(friendSearch))]);
+    setSocialBusy(false);
+    setSocialActionId(null);
   }
 
   async function handleAvatarUpload(file: File) {
@@ -577,6 +722,21 @@ export default function App() {
         ) : null}
         {currentView === "achievements" ? (
           <AchievementsView badges={badges} level={level} streak={currentStreak} />
+        ) : null}
+        {currentView === "community" ? (
+          <CommunityView
+            actionBusyId={socialActionId}
+            busy={socialBusy}
+            currentUsername={profile?.username ?? null}
+            leaderboard={leaderboard}
+            onAddFriend={handleAddFriend}
+            onOpenProfile={() => setProfileOpen(true)}
+            onRemoveFriend={handleRemoveFriend}
+            onSearchQueryChange={setFriendSearch}
+            searchQuery={friendSearch}
+            searchResults={friendSearchResults}
+            searching={searchingFriends}
+          />
         ) : null}
       </AppShell>
       <CreateHabitDialog

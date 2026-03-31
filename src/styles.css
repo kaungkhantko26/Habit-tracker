@@ -491,7 +491,8 @@ button:disabled {
 
 .hero-grid,
 .analytics-grid,
-.achievements-grid {
+.achievements-grid,
+.community-grid {
   display: grid;
   gap: 24px;
 }
@@ -501,7 +502,8 @@ button:disabled {
 }
 
 .analytics-grid,
-.achievements-grid {
+.achievements-grid,
+.community-grid {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
@@ -818,6 +820,127 @@ button:disabled {
 
 .badge-grid-panel {
   grid-column: span 12;
+}
+
+.community-summary,
+.community-search-panel,
+.community-board-panel {
+  padding: 24px;
+}
+
+.community-summary {
+  grid-column: span 4;
+}
+
+.community-search-panel {
+  grid-column: span 8;
+}
+
+.community-board-panel {
+  grid-column: span 12;
+}
+
+.community-note {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.community-note span {
+  color: var(--muted);
+}
+
+.community-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.community-row,
+.leaderboard-row {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--outline);
+  border-radius: 22px;
+  display: grid;
+  gap: 16px;
+  padding: 16px 18px;
+}
+
+.community-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.leaderboard-row {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+}
+
+.leaderboard-row.you {
+  background:
+    radial-gradient(circle at top right, rgba(105, 246, 184, 0.18), transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(232, 249, 240, 0.7));
+}
+
+.community-row-main {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  min-width: 0;
+}
+
+.community-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.community-copy strong {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.community-copy span,
+.leaderboard-rank {
+  color: var(--muted);
+}
+
+.leaderboard-rank {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  min-width: 44px;
+}
+
+.leaderboard-stats {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(72px, auto));
+}
+
+.leaderboard-stat {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leaderboard-stat strong {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.05rem;
+}
+
+.leaderboard-stat span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.primary-button.compact-inline {
+  padding: 10px 14px;
+  width: auto;
 }
 
 .milestone-strip {
@@ -1196,7 +1319,8 @@ button:disabled {
 
   .hero-grid,
   .analytics-grid,
-  .achievements-grid {
+  .achievements-grid,
+  .community-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1206,7 +1330,10 @@ button:disabled {
   .stat-stack,
   .featured-badge,
   .achievements-grid > .panel:nth-child(2),
-  .badge-grid-panel {
+  .badge-grid-panel,
+  .community-summary,
+  .community-search-panel,
+  .community-board-panel {
     grid-column: auto;
   }
 }
@@ -1367,6 +1494,20 @@ button:disabled {
 
   .badge-grid {
     grid-template-columns: 1fr;
+  }
+
+  .community-row,
+  .leaderboard-row {
+    grid-template-columns: 1fr;
+  }
+
+  .leaderboard-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .community-note {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .profile-editor-preview {
